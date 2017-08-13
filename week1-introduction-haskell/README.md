@@ -2,17 +2,17 @@
 ## What is Haskell?
 하스켈은 1980년도 후반에 만들어진 **lazy, functional** 프로그래밍 언어이다. 예전에 많은 lazy, functional 언어들이 넘쳐났는데, 사람들마다 각기 좋아하는 언어가 있었고 서로간에 의사소통이 어려웠다. 그래서 사람들이 모여서 기존 언어의 좋은 개념들을 모아 새로운 언어를 만들었고 그것이 바로 하스켈이다.
 
-![Haskell logo](https://)
+![Haskell logo](http://www.cis.upenn.edu/~cis194/spring13/images/haskell-logo-small.png)
 
 ### Functional
-![Function](https://)
+![Function](http://www.cis.upenn.edu/~cis194/spring13/images/function-machine.png)
 
 `functional` 에 대한 정확한 의미는 없다. 다만 하스켈을 `functional` 언어라고 말할 때 2가지를 떠올린다.
 - 함수는 `first-class`이다. 함수는 다른 값들을 사용하는 것처럼 사용할 수 있는 하나의 값이다.
 - 하스켈 프로그램은 지시명령어를 수행하기보단 표현을 평가하는 것에 초점이 맞춰져있다.
 
 ### Pure
-![Pure](http://)
+![Pure](http://www.cis.upenn.edu/~cis194/spring13/images/pure.jpg)
 
 하스켈 expressions 은 항상 *참조 투명*하다. 이 말인 즉슨,
 - *mutation* (상태) 이 없다. 모든 것이 *immutable* (불변) 이다.
@@ -27,7 +27,7 @@
 - Fewer headaches
 
 ### Lazy
-![Lazy](http://)
+![Lazy](http://www.cis.upenn.edu/~cis194/spring13/images/relax.jpg)
 
 하스켈에서 표현은 결과가 필요할 때까지 평가되지 않는다. 딱 필요할 때, 수행한다.
 
@@ -37,7 +37,7 @@
 - 그러나, 한 가지 않좋은 점은 시간과 공간 사용을 추론하는 것이 좀 더 복잡해진다.
 
 ### Statically typed
-![Statically typed](http://)
+![Statically typed](http://www.cis.upenn.edu/~cis194/spring13/images/static.jpg)
 
 모든 하스켈 표현은 타입을 가지며 모든 타입은 컴파일 타임에 체크된다. 타입 에러가 있는 경우 아예 컴파일 되지도 않는다.
 
@@ -75,5 +75,3 @@ for (int i=0; i< lst.length; i++){
 ```haskell
 sum (map (3*) lst)
 ```
-
-## Literate Haskell
