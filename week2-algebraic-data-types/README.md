@@ -1,4 +1,4 @@
-#Algebraic Data Types
+# Algebraic Data Types
 ## Enumeration types
 많은 프로그래밍 언어와 같이 하스켈에션 자신만의 enumeration 타입을 만들 수 있다.
 ```haskell
