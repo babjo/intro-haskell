@@ -84,3 +84,36 @@ lst2 = C 'x' (C 'y' (C 'z' E))
 lst3 :: List Bool
 lst3 = C True (C False E)
 ```
+
+### Polymorphic functions
+지금부터 새로운 polymorphic `List`에 맞게 `filterIntList`를 일반화해보자. 그냥 `Empty` 를 `E`로 `Cons`를 `C`로 바꾸면 된다.
+
+```haskell
+filterList _ E = E
+filterList p (C x xs)
+	| p x = C x (filterList p xs)
+	| otherwise = filterList p xs
+```
+
+자, `filterList`의 타입은 무엇인가? `ghci`가 타입추론을 어떻게하는지 보자.
+
+```haskell
+*Main> :t filterList
+filterList :: (t -> Bool) -> List t -> List t
+```
+
+우리는 이렇게 해석할 수 있다.: "어떤 타입 t에 대해 `filterList`는 (t -> Bool)인 함수를 받으며 t 타입 list 그리고 t 타입 list 를 반환한다."
+
+`mapIntList` 는 어떻게 일반화할까? `mapList` 에 어떤 타입을 줘야할까?
+
+```haskell
+mapList :: (t -> t) -> List t -> List t
+```
+
+```haskell
+mapList :: (a -> b) -> List a -> List b
+mapList _ E = E
+mapList f (C x xs) = C (f x) (mapList f xs)
+```
+
+polymorphic functions 핵심은 `the caller gets to pick the types` 이다.
