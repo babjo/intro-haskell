@@ -118,6 +118,17 @@ draw21times something = helper something (-10)
 보통 지역 정의 이름은 간단하게 `go`로 많이 사용한다. 그리고 타입 명시의 경우 종종 빠뜨리기도 한다. 그냥 설명이 필요없이 함수 라인도 몇줄안되고 작고 명확하기 때문이다.
 
 ## Captured variables
+
+이렇게 지역 함수를 만드는 것에는 또 다른 장점이 있다. `draw21times`으로 들어오는 인자를 지역 함수 내에서 참조할 수 있다. 이전 코드를 보면 `something` 인자를 받아서 `helper`로 넘겨주는데, 그럴 필요가 없다.
+
+```haskell
+draw21times :: (Integer -> Picture) -> Picture
+draw21times something = go (-10)
+  where
+    go 11 = blank
+    go n  = something n & go (n+1)
+```
+
 ## A note on indentation
 ## Lambda expressions
 
