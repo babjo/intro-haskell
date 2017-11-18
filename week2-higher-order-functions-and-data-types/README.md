@@ -69,7 +69,7 @@ drawCol :: Integer -> Integer -> Picture
 이게 바로 `Higher Order Function`이다. 함수가 다른 함수를 인자로 받을 수 있는 것이다. 이건 함수 프로그래밍의 핵심적이 아이디어며 좋은 추상화를 가능케하는 중요한 요소이다.
 
 ## Partial application
-`drawCol` 사용법에 조금 이상한 점이 있다. `drawCol`이 *두 개* 인자의 함수로 보이지만 `draw21times` 함수에서 `drawCol`를 인자 하나짜리 함수로 남들어 사용했다. 니는 어떻게 동작할까?
+`drawCol` 사용법에 조금 이상한 점이 있다. `drawCol`이 *두 개* 인자의 함수로 보이지만 `draw21times` 함수에서 `drawCol`를 인자 하나짜리 함수로 남들어 사용했다. 이는 어떻게 동작할까?
 
 이해를 위해, `drawCol` 타입을 다르게 써보았다.
 ```
@@ -82,7 +82,7 @@ drawCol :: Integer -> (Integer -> Picture)
 
 또한 함수 호출에서도 이점을 볼 수 있다. `f x y`는 `(f x) y`과 동일한 표현이다.
 
-정리하면 함수에서 `type` 화살표는 *right associative(오른쪽 연관)*이며 함수 호출에서는 *left associative(왼쪽 연관)*이다.
+정리하면 함수에서 `type` 화살표는 *right associative*(오른쪽 연관)이며 함수 호출에서는 *left associative*(왼쪽 연관)이다.
 
 ## Local definitions
 코드를 좀 정리하자. 먼저 `drawCol r c = drawTileAt r c`는 다소 불필요해보니다. 그저 `drawCol`를 사용하는 것은 `drawTileAt`과 동일하다. 그러므로 `drawCol`을 제거하자.
