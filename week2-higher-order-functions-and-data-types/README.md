@@ -130,11 +130,134 @@ draw21times something = go (-10)
 ```
 
 ## A note on indentation
+
+하스켈에서 들여쓰기(indentation)는 중요하다. 하스켈 컴파일러는 `where`절에서 `where`절의 끝을 어떻게 구분할까? 들여쓰기에 있다. 몇몇 다른 언어와 달리 하스켈은 들여쓰기(indentation)에 매우 민감하다. 그로 얻는 2가지 장점이 있다.
+- 코드를 보다 명확하고 읽기 쉽게 만든다.
+- 프로그래머가 적절히 들여쓰기를 하도록 만든다.
+
+들여쓰기 규칙에 대해서는 다소 기술적이어서 이 지면에서 설명하진 않는다. 그 대신에 [여길](https://en.wikibooks.org/wiki/Haskell/Indentation) 참조하길
+
 ## Lambda expressions
 
+함수를 정의하는 3가지 방법을 이미 보았다. 전역에서 정의하거나 `let` 구문으로 정의하거나 `where` 절로 정의하거나. 이 3가지 정의하는 방법에는 반드시 함수의 이름을 붙여줘야한다.
+
+그런데 함수에 이름을 붙이는 것이 굳이 필요없는 경우도 있다. 물론 다 붙일 수 있겠지만 이름을 짓는 다는건 어려운 일이다. 그래서 아주 작은 함수 경우엔 이름을 굳이 붙이긴 그렇고 그냥 우리가 사용할 곳에 정의만 해주고 싶을 때, `lambda`를 이용할 수 있다.
+
+`drawRow` 함수를 보자. 이 함수가 하는 것은 그저 `drawTileAt`을 인자로 하여 `draw21times`를 호출하는 것이다. 그러니 `pictureOfMaze`에서 `drawRow` 대신에 바로 `lambda`로 정의해보자.
+
+```haskell
+pictureOfMaze = draw21times (\r -> draw21times (drawTileAt r))
+```
+
+여기서 `\`(backslash)가 문자 λ(lambda)를 표현하며 익명, 로컬함수를 정의한다는 것을 의미한다. 그리고 이는 `r` 이라는 첫번째 인자를 받으며 `->` 다음 코드를 호출하여 결과를 리턴한다는 의미다.
+
+여기서 `lambda`를 한번 더 사용하여 좀 더 코드를 명확히 할 수 있다.
+
+```haskell
+pictureOfMaze = draw21times (\r -> draw21times (\c -> drawTileAt r c))
+```
+
+고차 함수, 지역함수, 람다 표현은 매우 간결하면서 읽기 좋은 코드를 만든다. 사용해보길...
+
 # Data types
+
+다음 챕터에서 저번주 과제 코드 상에서 몇몇 문제점을 다루면서 동기를 얻고 데이터 타입을 넣어 볼 예정이다.
+
+`drawTile`과 `maze` 함수는 `number`에 따라 타일의 타입을 지정한다. 그런데 이것에 문제가 있다. `maze`에서 받은 x, y 값으로 타입을 결정하여 화면을 만들기는 쉬운데, 이렇게 숫자로 관리하는 것은 숫자가 어떤 타입을 가지는지 잊어버리기가 쉽다.
+
+그래서 `Integers`는 타입을 표현하는데 좋지가 않은 문제점이 있다. 너무 암시적이다.
+
+그래서 명시적으로 타입을 표현하고 싶으며 할 수 있는 방법이 있다.
+
+```hasekll
+data Tile = Wall | Ground | Storage | Box | Blank
+```
+
+`data`는 새로운 타입의 이름을 정하는 예약어이다. 타입과 생성자 이름은 보통 대문자로 시작하며 각각 그들만의 네임스페이스를 가진다.
+
+새로운 타입 `Tile`에는 5개의 생성자가 있으며 이는 각각 이 타입의 값들을 의미한다. 아까 전보다 훨씬 명확해졌다.
+
+다시 `maze`로 돌아가서 `drawTile`에서 pattern match를 보자.
+
+```haskell
+drawTile :: Tile -> Picture
+drawTile Wall    = wall
+drawTile Ground  = ground
+drawTile Storage = storage
+drawTile Box     = box
+drawTile Blank   = blank
+
+maze :: Integer -> Integer -> Tile
+maze x y
+  | abs x > 4  || abs y > 4  = Blank
+  | abs x == 4 || abs y == 4 = Wall
+  | x ==  2 && y <= 0        = Wall
+  | x ==  3 && y <= 0        = Storage
+  | x >= -2 && y == 0        = Box
+  | otherwise                = Ground
+```
+
+`drawTile`의 타입과 `maze`의 타입에서 `Integer`가 없어지고 `Tile` 타입이 들어오면서 좀더 명확해졌다.
+
 ## Booleans
+
+저번주에 사실 데이터타입을 이용한적이 있다. `Bool` 타입인데, 이는 `True`와 `False`를 값으로 가진다. 이전에서 새로운 타입을 정의한 것처럼 `Bool`도 동일한 매커니즘으로 동작한다.
+
+```haskell
+data Bool = False | True
+```
+
 ## More data types for Sokoboban
+
+이제는 애니메이션과 인터렉션할 수 있도록 만들어보자. 먼저 우리가 할 수 있는 인터렉션은 뷰를 4가지 방향 중 하나로 움직이는 인터렉션으로 이렇게 새로운 타입을 정의 할 수 있다.
+
+```haskell
+data Directoin = R | U | L | D
+```
+
+그리고 몇번 인터렉션한 후 현재의 위치를 저장할 곳이 필요하다. 이 위치는 좌표로 두개의 정수로 표현할 수 있으며 이렇게 타입으로 정의할 수 있다.
+
+```haskell
+data Coord = C Integer Integer
+```
+
+`Coord`를 새로 정의했다. `C`라는 생성자 하나만을 가지는데 이는 두 개의 정수를 인자로 받는다. (Integer -> Integer -> Coord)
+
+사용하는 방법이다.
+
+```hasekll
+initialCoord :: Coord
+initialCoord = C 0 0
+```
+
+`Coord`를 어떻게 사용할까? 이를 이렇게 사용할 수 있다.
+
+```haskell
+atCoord :: Coord -> Picture -> Picture
+atCoord (C x y) pic = translated (fromIntegral x) (fromIntegral y) pic
+```
+
+이렇게 함수인자로 타입을 넘길 때 괄호로 패턴 매칭할 인자르 명시하여 인자를 넘길 수 있다.
+
+다음 함수는 사용자의 인터렉션 값을 받으면 서로운 좌표를 만드는 함수다. 기존 좌표 값을 받아 방향에 따라 좌표를 새로 만든다.
+
+```haskell
+adjacentCoord :: Direction -> Coord -> Coord
+adjacentCoord R (C x y) = C (x+1) y
+adjacentCoord U (C x y) = C  x   (y+1)
+adjacentCoord L (C x y) = C (x-1) y
+adjacentCoord D (C x y) = C  x   (y-1)
+```
+
+자 그림 하나 없이 코딩만 했다. 아래 코드를 작성하고 화면을 확인하자. (CodeWorld)[https://code.world/haskell#PAp1po1qT2i8Dmim1XCGfWw]
+
+```haskell
+someCoord :: Coord
+someCoord = adjacentCoord U (adjacentCoord U (adjacentCoord L initialCoord))
+
+main = drawingOf (atCoord someCoord pictureOfMaze)
+```
+
 
 # Pure Interaction
 ## Interaction on CodeWorld
