@@ -249,7 +249,7 @@ adjacentCoord L (C x y) = C (x-1) y
 adjacentCoord D (C x y) = C  x   (y-1)
 ```
 
-자 그림 하나 없이 코딩만 했다. 아래 코드를 작성하고 화면을 확인하자. (CodeWorld)[https://code.world/haskell#PAp1po1qT2i8Dmim1XCGfWw]
+자 지금까지 그림 하나 없이 코딩만 했다. 아래 코드를 작성하고 화면을 확인하자. (CodeWorld)[https://code.world/haskell#PAp1po1qT2i8Dmim1XCGfWw]
 
 ```haskell
 someCoord :: Coord
@@ -260,6 +260,79 @@ main = drawingOf (atCoord someCoord pictureOfMaze)
 
 
 # Pure Interaction
+
+자 이제는 화살표 키를 사용해서 미로를 이동해야한다. 이미 거의 모든 기능을 구현했지만 여기서 어떻게  `side-effect` 없이 인터렉션을 구현할 수 있을까? 어떻게 `mutable` 변수 없이 현재 상태를 기억할 수 있을까?
+
+이전에 애니메이션을 구현할 때, 이 수수께끼를 풀었다. 순수 함수로 우리의 생각을 모델링한 다음 이 순수함수를 원하는 효과로 실행하는 `machinery`를 만들었었다.
+
+인터렉티브한 프로그램은 새로운 입력을 받을 때마다 상태를 변경한다. 현재 상태를 기억하는 로직에서 상태를 변화시키는 로직을 분리하는 경우, 상태를 변화시키 로직은 다시 주어진 입력 값과 현재 상태를 넣으면 새로운 상태를 반환하는 순수 함수가 된다. 추가적으로 최초의 상태를 정의해주고 그 상태를 화면에 어떻게 그릴지 지정하는 것도 필요하다. 
+
 ## Interaction on CodeWorld
+
+이 기능은 CodeWorld에서 제공한다.
+
+```haskell
+interactionOf :: world ->
+                (Double -> world -> world) ->
+                (Event -> world -> world) ->
+                (world -> Picture) ->
+                IO ()
+```
+
+위의 `world`이라는 타입은 어떤 타입을 특정하는 것이 아니고 그냥 타입 변수이다. 물론 나중에 다루겠지만, 지금 알아야할 것은 이 `world`가 어떤 타입이든 가능하는 점이다. 이 `world`를 통해 프로그램을 상태를 나타내자.
+
+`interactionOf`는 4가지 인자를 받는다.
+1. 최초 상태
+2. 주어진 시간 값으로 상태를 변화하는 함수
+3. 주어진 이벤트 값으로 상태를 변화하는 함수
+4. 현재 상태를 그리는 함수
+
+`Coord`로 이 함수를 사용하는 방법은 보면, (CodeWorld)[https://code.world/haskell#PpjfIR2NrgPeBJQKfg_63Kg]
+
+```haskell
+main = interactionOf initialCoord handleTime handleEvent drawState
+
+handleTime :: Double -> Coord -> Coord
+handleTime _ c = c
+
+handleEvent :: Evnet -> Coord -> Coord
+handleEvent e c = adjacentCoord U c
+
+drawState :: Coord -> Picture
+drawState c = atCoord c pictureOfMaze
+```
+
+마우스를 화면상에서 움직이면 미로가 올라가는걸 볼 수 있다. 마우스 오버도 하나의 이벤트로 받아서 올라가는 것이다.
+
 ## Events
+
+그래서 `Event` 타입이 무엇인지 알아볼 필요가 있다. 문서를 보면 이는 데이터 타입이다. 우리가 잘 아는 데이터 타입!
+
+```haskell
+data Event = KeyPress Text
+           | KeyRelease Text
+           | MousePress MouseButton Point
+           | MouseRelease MouseButton Point
+           | MouseMovement Point
+```
+
+5개의 서로 다른 이벤트가 생성자로 있다. `KeyPress` 이벤트는 `Text`을 인자로 받으며 사용해본적은 없지만 대략 감이 온다. (CodeWorld)[https://code.world/haskell#Px4XRGfE1Aw0GCEDKSDVAAw]
+
+```haskell
+handleEvent :: Event -> Coord -> Coord
+handleEvent (KeyPress key) c
+    | key == "Right" = adjacentCoord R c
+    | key == "Up"    = adjacentCoord U c
+    | key == "Left"  = adjacentCoord L c
+    | key == "Down"  = adjacentCoord D c
+handleEvent _ c      = c
+```
+
+이제 화샬표 키로 미로를 움직일 수 있다.
+
 ## Some terminology
+
+- 데이터 타입에서 인자가 없는 생성자는 *enumeration type*이라 한다.
+- 데이터 타입에서 단 하나의 생성자만 가지면 *product type*이라 한다.
+- 데이터 타입에서 여러 생성자를 가지면 *sum type*이라 한다.
+- 데이터 타입에서 생성자가 하나도 없으면 *empty type*이라 한다.
